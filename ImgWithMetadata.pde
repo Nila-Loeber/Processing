@@ -5,6 +5,7 @@ public class ImgWithMetadata
   int[] histogramHue=new int[256];
   int[] histogramSat=new int[256];
   int[] histogramBri=new int[256];
+  int dominantHue;
 
   ImgWithMetadata(String filename)
   {
@@ -12,6 +13,7 @@ public class ImgWithMetadata
     image=img;
     imageFilename = filename;
     buildHistograms();
+    dominantHue = calcDominantHue();
   }
 
   void buildHistograms()
@@ -27,5 +29,28 @@ public class ImgWithMetadata
       histogramBri[bri]++;
     }
   }
+  
+  int compareTo(Object o)
+  {
+    ImgWithMetadata other=(ImgWithMetadata)o;
+    if (other.dominantHue>dominantHue)  
+      return -1;
+    if (other.dominantHue==dominantHue)
+      return 0;
+    else
+      return 1;
+  }
+
+  private int calcDominantHue()
+  {
+    int maxCount = max(histogramHue);
+    int dominantHue=0;
+    for (int i=0; i<histogramHue.length; i++)
+    {
+      if (histogramHue[i]==maxCount) dominantHue = i;
+    }
+    return dominantHue;
+  }
+  
 }
 
