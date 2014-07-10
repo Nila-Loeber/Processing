@@ -1,4 +1,4 @@
-public class ImgWithMetadata 
+public class ImgWithMetadata implements Comparable 
 {
   PImage image;
   String imageFilename;

@@ -1,6 +1,9 @@
 import java.util.Arrays;
 import java.util.List;
 import java.io.FilenameFilter;
+import java.util.Collections;
+import java.util.EnumSet;
+import static java.util.EnumSet.of;
 
 File[] listFiles(String dir, final String allowedExt) {
   File file = new File(dir);
@@ -68,10 +71,15 @@ int getPos(int x, int y)
 }
 
 
-int xSize =5;
-int ySize = 5;
-int imgXSize=150;
-int imgYSize=150;
+int xSize=9;
+int ySize=6;
+int cutoffBri = 100;
+int percentageBri = 70;
+int cutoffSat = 110;
+int percentageSat = 70;
+int imgXSize=300;
+int imgYSize=300;
+int filesFound = 0;
 File[] files;
 ArrayList<ImgWithMetadata> imgs;
 List<ImgWithMetadata> filteredList;
@@ -80,7 +88,8 @@ void setup()
 {
   imgs = new ArrayList<ImgWithMetadata>();
   size(xSize*imgXSize, ySize*imgYSize);
-  String path = sketchPath+"/data";
+  //String path = sketchPath+"/data";
+  String path = "/Users/Nils/PycharmProjects/jsontests/hiresImgs";
   files = listFiles(path, ".jpeg");
   noLoop();
   for (int i=0; i<files.length; i++)
@@ -88,15 +97,18 @@ void setup()
     String filename = files[i].getName();
     try 
     {
-      imgs.add(new ImgWithMetadata(filename));
+      imgs.add(new ImgWithMetadata(path+"/"+filename));
     }
     catch (Exception e)
     {
       println("Error loading " +  filename);
     }
   }
-  filteredList = hpf(70, 150, imgs, histogramTypes.SAT);
-  println("Files after HPF: " + filteredList.size());
+  //filteredList = hpf(25, 190, imgs, histogramTypes.SAT);
+  filteredList = hpf(percentageBri, cutoffBri, hpf(percentageSat, cutoffSat, imgs, histogramTypes.SAT), histogramTypes.BRI);
+  filesFound = filteredList.size();
+  println("Files after HPF: " + filesFound);
+  Collections.sort(filteredList);
 }
 
 
@@ -110,10 +122,10 @@ void draw()
     for (int x = 0; x<xSize; x++)
     {
       int currentPos = getPos(x, y);
-      image(filteredList.get(currentPos).image, x*imgXSize, y*imgYSize, 150, 150);
+      image(filteredList.get(currentPos).image, x*imgXSize, y*imgYSize, imgXSize, imgYSize);
       // println(currentPos + " : " + imgs[currentPos].hue);
     }
   }
-  save("hues"+xSize+"x"+ySize+".png");
+  save("hues"+xSize+"x"+ySize+"-bri"+cutoffBri+percentageBri+"-sat"+cutoffSat+percentageSat+"-ff"+filesFound+".png");
 }
 
