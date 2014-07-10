@@ -38,9 +38,9 @@ List<ImgWithMetadata> hpf(int cutoffPercentage, int cutoffValue, List<ImgWithMet
     {
       switch (histogramType)
       {
-        case HUE: 
-          numPixelsAboveCutoff+=img.histogramHue[i];
-          break;
+      case HUE: 
+        numPixelsAboveCutoff+=img.histogramHue[i];
+        break;
       case SAT: 
         //println(img.histogramSat[i]);
         numPixelsAboveCutoff+=img.histogramSat[i];
@@ -71,12 +71,12 @@ int getPos(int x, int y)
 }
 
 
-int xSize=9;
-int ySize=6;
-int cutoffBri = 100;
+int xSize=4;
+int ySize=4;
+int cutoffBri = 10;
 int percentageBri = 70;
-int cutoffSat = 110;
-int percentageSat = 70;
+int cutoffSat = 10;
+int percentageSat = 60;
 int imgXSize=300;
 int imgYSize=300;
 int filesFound = 0;
@@ -89,9 +89,8 @@ void setup()
   imgs = new ArrayList<ImgWithMetadata>();
   size(xSize*imgXSize, ySize*imgYSize);
   //String path = sketchPath+"/data";
-  String path = "/Users/Nils/PycharmProjects/jsontests/hiresImgs";
+  String path = "/Users/Nils/PycharmProjects/jsontests/hiresImgs_test";
   files = listFiles(path, ".jpeg");
-  noLoop();
   for (int i=0; i<files.length; i++)
   {
     String filename = files[i].getName();
@@ -111,10 +110,21 @@ void setup()
   Collections.sort(filteredList);
 }
 
+void mousePressed() {
+  background(0);
+  if (mouseButton == LEFT) {
+    RemoveFromList(mouseX, mouseY);
+  } else if (mouseButton == RIGHT) {
+    drawMosaic();
+  }
+}
 
+void RemoveFromList(int x, int y)
+{
+  filteredList.remove(getPos(x/imgXSize, y/imgYSize));
+}
 
-
-void draw()
+void drawMosaic()
 {
   if (filteredList.size()<xSize*ySize) return;
   for (int y = 0; y<ySize; y++)
@@ -123,9 +133,21 @@ void draw()
     {
       int currentPos = getPos(x, y);
       image(filteredList.get(currentPos).image, x*imgXSize, y*imgYSize, imgXSize, imgYSize);
-      // println(currentPos + " : " + imgs[currentPos].hue);
     }
   }
-  save("hues"+xSize+"x"+ySize+"-bri"+cutoffBri+percentageBri+"-sat"+cutoffSat+percentageSat+"-ff"+filesFound+".png");
+}
+
+
+void keyPressed()
+{
+  if (key=='s') 
+  {
+    save("hues"+xSize+"x"+ySize+"-bri"+cutoffBri+percentageBri+"-sat"+cutoffSat+percentageSat+"-ff"+filesFound+".png");
+  }
+}
+
+void draw()
+{
+  //drawMosaic();
 }
 
