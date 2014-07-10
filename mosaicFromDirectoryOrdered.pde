@@ -71,14 +71,14 @@ int getPos(int x, int y)
 }
 
 
-int xSize=4;
-int ySize=4;
-int cutoffBri = 10;
-int percentageBri = 70;
-int cutoffSat = 10;
-int percentageSat = 60;
-int imgXSize=300;
-int imgYSize=300;
+int xSize=12;
+int ySize=9;
+int cutoffBri = 90;
+int percentageBri = 55;
+int cutoffSat = 130;
+int percentageSat = 70;
+int imgXSize=150;
+int imgYSize=150;
 int filesFound = 0;
 File[] files;
 ArrayList<ImgWithMetadata> imgs;
@@ -88,8 +88,8 @@ void setup()
 {
   imgs = new ArrayList<ImgWithMetadata>();
   size(xSize*imgXSize, ySize*imgYSize);
-  //String path = sketchPath+"/data";
-  String path = "/Users/Nils/PycharmProjects/jsontests/hiresImgs_test";
+  String path = sketchPath+"/data";
+  //String path = "/Users/Nils/PycharmProjects/jsontests/hiresImgs_combined";
   files = listFiles(path, ".jpeg");
   for (int i=0; i<files.length; i++)
   {
@@ -111,28 +111,37 @@ void setup()
 }
 
 void mousePressed() {
-  background(0);
   if (mouseButton == LEFT) {
     RemoveFromList(mouseX, mouseY);
-  } else if (mouseButton == RIGHT) {
     drawMosaic();
   }
 }
 
 void RemoveFromList(int x, int y)
 {
-  filteredList.remove(getPos(x/imgXSize, y/imgYSize));
+  int delImgXPos = x/imgXSize;
+  int delImgYPos = y/imgYSize;
+  int delListPos = getImgPositionInList(getPos(delImgXPos, delImgYPos));
+  filteredList.remove(delListPos);
+}
+
+int getImgPositionInList(int screenPosition)
+{
+  int totalImages = filteredList.size();
+ return int(map(screenPosition,0,xSize*ySize,0,totalImages-1));
 }
 
 void drawMosaic()
 {
-  if (filteredList.size()<xSize*ySize) return;
+  int totalImages = filteredList.size();
+  if (totalImages<xSize*ySize) return;
   for (int y = 0; y<ySize; y++)
   {
     for (int x = 0; x<xSize; x++)
     {
       int currentPos = getPos(x, y);
-      image(filteredList.get(currentPos).image, x*imgXSize, y*imgYSize, imgXSize, imgYSize);
+      int imgPos = getImgPositionInList(currentPos);
+      image(filteredList.get(imgPos).image, x*imgXSize, y*imgYSize, imgXSize, imgYSize);
     }
   }
 }
@@ -144,10 +153,24 @@ void keyPressed()
   {
     save("hues"+xSize+"x"+ySize+"-bri"+cutoffBri+percentageBri+"-sat"+cutoffSat+percentageSat+"-ff"+filesFound+".png");
   }
+  if (key=='+')
+  {
+    imgXSize*=2;
+    imgYSize*=2;
+    size(xSize*imgXSize, ySize*imgYSize);
+    drawMosaic();
+  }
+  if (key=='-')
+  {
+    imgXSize/=2;
+    imgYSize/=2;
+    size(xSize*imgXSize, ySize*imgYSize);
+    drawMosaic();
+  }
 }
 
 void draw()
 {
-  //drawMosaic();
+  drawMosaic();
 }
 
